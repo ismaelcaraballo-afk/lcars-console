@@ -11,7 +11,7 @@ export default function WeatherPanel() {
 
   // Fetch current weather
   const { data: weather, isLoading, refetch } = useQuery({
-    queryKey: ["/api/weather", city],
+    queryKey: [`/api/weather?city=${city}`],
   });
 
   const handleSearch = () => {
