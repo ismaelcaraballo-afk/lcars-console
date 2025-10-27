@@ -20,11 +20,13 @@ A production-ready **Star Trek LCARS-themed productivity dashboard** built with 
 - **AI Chat**: Natural language interface (Claude AI integration ready)
 - **Notifications**: Real-time system notifications
 - **Settings**: Customizable preferences
+- **🎤 Voice Control**: Star Trek-style voice commands - say "Computer" followed by any command!
 
 ### 🎨 LCARS Design
 - Authentic Star Trek LCARS color scheme (purple/pink gradients)
 - Scanning animations and glowing effects
 - LCARS sound effects (beeps and tones)
+- **Voice recognition** with visual feedback (microphone pulses when listening)
 - Responsive design for all devices
 - Starfield background
 - Smooth panel transitions
