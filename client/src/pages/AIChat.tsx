@@ -80,7 +80,7 @@ export default function AIChat() {
 
       if (data.error && data.apiAvailable === false) {
         // Use local NLP if Claude AI not available
-        aiResponse = processNaturalLanguage(message);
+        aiResponse = await processNaturalLanguage(message);
       } else {
         aiResponse = data.response;
       }
@@ -94,7 +94,7 @@ export default function AIChat() {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       // Fallback to local NLP
-      const aiResponse = processNaturalLanguage(message);
+      const aiResponse = await processNaturalLanguage(message);
       const assistantMessage: Message = {
         role: "assistant",
         content: aiResponse,
@@ -135,57 +135,93 @@ export default function AIChat() {
     return { mood, score, icon };
   };
 
-  const processNaturalLanguage = (text: string): string => {
+  const processNaturalLanguage = async (text: string): Promise<string> => {
     const lower = text.toLowerCase();
+    let responses: string[] = [];
 
-    // Greeting
-    if (/^(hi|hello|hey|greetings)/i.test(lower)) {
+    // Check for compound questions (multiple topics in one query)
+    const hasTime = /time|clock|stardate/i.test(lower);
+    const hasWeather = /weather|temperature|forecast/i.test(lower);
+    const hasTasks = /task|todo|to-do|reminder/i.test(lower);
+    const hasStatus = /status|health|system|diagnostic/i.test(lower);
+    const hasJoke = /joke|funny|laugh/i.test(lower);
+    const hasGreeting = /^(hi|hello|hey|greetings)/i.test(lower);
+    const hasThanks = /thank|thanks/i.test(lower);
+    const hasSwallow = /swallow|african|european/i.test(lower);
+
+    // Handle greetings first
+    if (hasGreeting) {
       return "Hello! I'm your LCARS AI assistant. How can I help you today?";
     }
 
-    // Thanks
-    if (/thank|thanks/i.test(lower)) {
+    if (hasThanks) {
       return "You're welcome! I'm always here to assist you.";
     }
 
-    // Weather
-    if (/weather|temperature|forecast/i.test(lower)) {
-      return "For detailed weather information, please visit the Weather panel. I can provide current conditions and 7-day forecasts.";
-    }
-
-    // Tasks
-    if (/task|todo|to-do|reminder/i.test(lower)) {
-      return "You can manage your tasks in the Task Manager panel. I can help you add, complete, or organize tasks.";
-    }
-
-    // Time/Date
-    if (/time|date|clock|stardate/i.test(lower)) {
+    // Compound query handling - gather all relevant data
+    if (hasTime) {
       const now = new Date();
       const stardate = (41000.0 + (Date.now() % 31536000000) / 31536000).toFixed(2);
-      return `Current Earth time: ${now.toLocaleTimeString()}\nStardate: ${stardate}`;
+      responses.push(`⏰ TIME: ${now.toLocaleTimeString()} | Stardate: ${stardate}`);
     }
 
-    // Status
-    if (/status|health|system|diagnostic/i.test(lower)) {
-      return "All LCARS systems are operating at optimal levels. Core systems: NOMINAL, AI Module: READY, Data Storage: OPERATIONAL.";
+    if (hasTasks) {
+      try {
+        const tasksResponse = await fetch("/api/tasks");
+        const tasks = await tasksResponse.json();
+        const activeTasks = tasks.filter((t: any) => t.status === "active");
+        const completed = tasks.filter((t: any) => t.status === "completed");
+        
+        responses.push(`📋 TASKS: ${activeTasks.length} active, ${completed.length} completed`);
+        
+        if (activeTasks.length > 0) {
+          const topTasks = activeTasks.slice(0, 3).map((t: any) => `  • ${t.title}`).join('\n');
+          responses.push(`Top priorities:\n${topTasks}`);
+        }
+      } catch (error) {
+        responses.push(`📋 TASKS: Unable to fetch task data`);
+      }
     }
 
-    // Jokes
-    if (/joke|funny|laugh/i.test(lower)) {
+    if (hasWeather) {
+      try {
+        const weatherResponse = await fetch("/api/weather/current");
+        const weather = await weatherResponse.json();
+        responses.push(`🌤️ WEATHER: ${weather.temp}°C, ${weather.condition} in ${weather.city}`);
+      } catch (error) {
+        responses.push(`🌤️ WEATHER: Unable to fetch weather data`);
+      }
+    }
+
+    if (hasStatus) {
+      responses.push(`💚 SYSTEM STATUS: All LCARS systems NOMINAL\n  • Core: OPERATIONAL\n  • AI Module: READY\n  • Storage: ACTIVE`);
+    }
+
+    if (hasJoke) {
       const jokes = [
         "Why do programmers prefer dark mode? Because light attracts bugs! 😄",
         "How many programmers does it take to change a light bulb? None, that's a hardware problem!",
         "Why did the developer go broke? Because he used up all his cache!",
+        "What's the object-oriented way to become wealthy? Inheritance! 💰",
       ];
-      return jokes[Math.floor(Math.random() * jokes.length)];
+      responses.push(`😄 ${jokes[Math.floor(Math.random() * jokes.length)]}`);
     }
 
-    // About
-    if (/about|what is|tell me about|explain/i.test(lower)) {
+    // Easter egg: African or European swallow reference (Monty Python)
+    if (hasSwallow) {
+      responses.push(`🐦 SWALLOW ANALYSIS:\nAfrican Swallow: Unladen airspeed ~24 mph (non-migratory)\nEuropean Swallow: Unladen airspeed ~20.1 mph\n\nNote: Swallows cannot carry coconuts. Bridge of Death protocols do not apply here.`);
+    }
+
+    // If we gathered multiple responses, combine them
+    if (responses.length > 0) {
+      return responses.join('\n\n');
+    }
+
+    // Single topic queries
+    if (/about|what is|tell me about|explain/i.test(lower) && !hasSwallow) {
       return "I'm the LCARS AI Console - a Star Trek-themed productivity dashboard. I can help with task management, weather info, analytics, and natural language processing.";
     }
 
-    // API Status
     if (/api|claude|anthropic/i.test(lower)) {
       return "🤖 Claude AI Integration is ready to activate! Add your ANTHROPIC_API_KEY to .env to enable advanced AI conversations. See API-ALTERNATIVES.md for other options (OpenAI, Gemini, Perplexity).";
     }
@@ -235,7 +271,7 @@ export default function AIChat() {
 
       if (data.error && data.apiAvailable === false) {
         // Use local NLP if Claude AI not available
-        aiResponse = processNaturalLanguage(input);
+        aiResponse = await processNaturalLanguage(input);
       } else {
         aiResponse = data.response;
       }
@@ -249,7 +285,7 @@ export default function AIChat() {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       // Fallback to local NLP
-      const aiResponse = processNaturalLanguage(input);
+      const aiResponse = await processNaturalLanguage(input);
       const assistantMessage: Message = {
         role: "assistant",
         content: aiResponse,
