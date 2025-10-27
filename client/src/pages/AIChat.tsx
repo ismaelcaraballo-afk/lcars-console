@@ -29,6 +29,83 @@ export default function AIChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Process voice commands from sessionStorage
+  useEffect(() => {
+    const voiceCommand = sessionStorage.getItem("voiceCommand");
+    if (voiceCommand) {
+      // Clear it immediately to prevent re-processing
+      sessionStorage.removeItem("voiceCommand");
+      
+      // Set the input and automatically send it
+      setInput(voiceCommand);
+      
+      // Auto-send after a brief delay to ensure UI updates
+      setTimeout(() => {
+        if (voiceCommand.trim()) {
+          handleVoiceMessage(voiceCommand);
+        }
+      }, 500);
+    }
+  }, []);
+
+  const handleVoiceMessage = async (message: string) => {
+    const userMessage: Message = {
+      role: "user",
+      content: message,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput(""); // Clear input
+    setIsProcessing(true);
+
+    // Analyze sentiment
+    const sentimentResult = analyzeSentiment(message);
+    setSentiment(sentimentResult);
+
+    // Simulate processing time
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    try {
+      // Check if Claude AI is available
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+
+      const data = await response.json();
+
+      let aiResponse: string;
+
+      if (data.error && data.apiAvailable === false) {
+        // Use local NLP if Claude AI not available
+        aiResponse = processNaturalLanguage(message);
+      } else {
+        aiResponse = data.response;
+      }
+
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: aiResponse,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      // Fallback to local NLP
+      const aiResponse = processNaturalLanguage(message);
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: aiResponse,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const analyzeSentiment = (text: string) => {
     const positiveWords = ["good", "great", "awesome", "amazing", "excellent", "happy", "love", "perfect"];
     const negativeWords = ["bad", "terrible", "awful", "hate", "worst", "horrible", "sad", "angry"];

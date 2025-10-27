@@ -56,50 +56,57 @@ export default function App() {
     "--sidebar-width-icon": "4rem",
   };
 
-  // Voice recognition integration
-  const handleVoiceCommand = (command: string) => {
+  // Voice recognition integration - Enhanced AI-powered command processing
+  const handleVoiceCommand = async (command: string) => {
     const lowerCommand = command.toLowerCase();
     
-    // Panel navigation commands
-    if (lowerCommand.includes("dashboard") || lowerCommand.includes("home")) {
+    // Navigation commands (simple panel switching)
+    if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("dashboard")) {
       setLocation("/");
       toast({ title: "Voice Command", description: "Opening Dashboard" });
-    } else if (lowerCommand.includes("task")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("task")) {
       setLocation("/tasks");
       toast({ title: "Voice Command", description: "Opening Task Manager" });
-    } else if (lowerCommand.includes("weather")) {
-      setLocation("/weather");
-      toast({ title: "Voice Command", description: "Opening Weather Panel" });
-    } else if (lowerCommand.includes("calendar")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("calendar")) {
       setLocation("/calendar");
       toast({ title: "Voice Command", description: "Opening Calendar" });
-    } else if (lowerCommand.includes("analytics")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("analytics")) {
       setLocation("/analytics");
       toast({ title: "Voice Command", description: "Opening Analytics" });
-    } else if (lowerCommand.includes("space")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("space")) {
       setLocation("/space");
       toast({ title: "Voice Command", description: "Opening Space Panel" });
-    } else if (lowerCommand.includes("travel") || lowerCommand.includes("route")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && (lowerCommand.includes("travel") || lowerCommand.includes("route"))) {
       setLocation("/travel");
       toast({ title: "Voice Command", description: "Opening Travel Calculator" });
-    } else if (lowerCommand.includes("notification")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("notification")) {
       setLocation("/notifications");
       toast({ title: "Voice Command", description: "Opening Notifications" });
-    } else if (lowerCommand.includes("terminal") || lowerCommand.includes("console")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && (lowerCommand.includes("terminal") || lowerCommand.includes("console"))) {
       setLocation("/terminal");
       toast({ title: "Voice Command", description: "Opening Terminal" });
-    } else if (lowerCommand.includes("ai") || lowerCommand.includes("chat")) {
-      setLocation("/ai");
-      toast({ title: "Voice Command", description: "Opening AI Chat" });
-    } else if (lowerCommand.includes("settings")) {
+    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("settings")) {
       setLocation("/settings");
       toast({ title: "Voice Command", description: "Opening Settings" });
-    } else {
+    }
+    // Weather queries
+    else if (lowerCommand.includes("weather")) {
+      setLocation("/weather");
       toast({ 
-        title: "Voice Command Not Recognized", 
-        description: `Try: "Computer, open dashboard" or "Computer, show tasks"`,
-        variant: "destructive"
+        title: "🌤️ Weather Request", 
+        description: "Opening Weather Panel with current conditions"
       });
+    }
+    // AI queries - Send everything else to AI Chat
+    else {
+      setLocation("/ai");
+      toast({ 
+        title: "🤖 Processing with AI", 
+        description: "Opening AI Chat to answer your question..."
+      });
+      
+      // Store the voice command in sessionStorage for AI Chat to pick up
+      sessionStorage.setItem("voiceCommand", command);
     }
   };
 
