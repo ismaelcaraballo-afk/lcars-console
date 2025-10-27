@@ -2,93 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
+/* LCARS CONSOLE - DARK THEME (Star Trek Interface) */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
 
   /* Automatic computation of border around primary / danger buttons */
-  --opaque-button-border-intensity: -8; /* In terms of percentages */
+  --opaque-button-border-intensity: 9; /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .09);
 
-  --background: 0 0% 98%;
+  /* LCARS Dark Theme Colors */
+  --background: 240 100% 4%; /* Deep space black */
 
-  --foreground: 240 5% 15%;
+  --foreground: 0 0% 88%; /* Light gray text */
 
-  --border: 0 0% 88%;
+  --border: 262 80% 30%; /* Purple border glow */
 
-  --card: 0 0% 96%;
+  --card: 240 100% 6%; /* Slightly lighter panels */
 
-  --card-foreground: 240 5% 18%;
+  --card-foreground: 0 0% 90%;
 
-  --card-border: 0 0% 92%;
+  --card-border: 262 100% 40%;
 
-  --sidebar: 0 0% 94%;
+  --sidebar: 240 100% 8%; /* Sidebar slightly elevated */
 
-  --sidebar-foreground: 240 5% 20%;
+  --sidebar-foreground: 0 0% 92%;
 
-  --sidebar-border: 0 0% 90%;
+  --sidebar-border: 262 80% 35%;
 
-  --sidebar-primary: 262 100% 70%;
+  --sidebar-primary: 262 100% 70%; /* LCARS Purple */
 
-  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-primary-foreground: 0 0% 0%; /* Black text on purple */
 
-  --sidebar-accent: 320 100% 92%;
+  --sidebar-accent: 320 100% 80%; /* LCARS Pink accent */
 
-  --sidebar-accent-foreground: 320 60% 25%;
+  --sidebar-accent-foreground: 0 0% 0%;
 
   --sidebar-ring: 262 100% 70%;
 
-  --popover: 0 0% 90%;
+  --popover: 240 100% 7%;
 
-  --popover-foreground: 240 5% 22%;
+  --popover-foreground: 0 0% 94%;
 
-  --popover-border: 0 0% 86%;
+  --popover-border: 262 80% 40%;
 
-  --primary: 262 100% 70%;
+  --primary: 262 100% 70%; /* LCARS Purple primary */
 
-  --primary-foreground: 0 0% 100%;
+  --primary-foreground: 0 0% 0%; /* Black text on purple */
 
-  --secondary: 0 0% 86%;
+  --secondary: 320 100% 80%; /* LCARS Pink secondary */
 
-  --secondary-foreground: 240 5% 25%;
+  --secondary-foreground: 0 0% 0%;
 
-  --muted: 262 8% 88%;
+  --muted: 240 15% 12%;
 
-  --muted-foreground: 262 8% 35%;
+  --muted-foreground: 0 0% 65%;
 
-  --accent: 320 15% 90%;
+  --accent: 320 100% 85%; /* Light pink accents */
 
-  --accent-foreground: 320 15% 30%;
+  --accent-foreground: 0 0% 0%;
 
-  --destructive: 348 83% 47%;
+  --destructive: 348 83% 47%; /* Red for alerts */
 
   --destructive-foreground: 0 0% 100%;
 
-  --input: 0 0% 75%;
-  --ring: 262 100% 70%;
-  --chart-1: 262 100% 45%;
-  --chart-2: 320 100% 50%;
-  --chart-3: 142 76% 36%;
-  --chart-4: 48 96% 53%;
-  --chart-5: 27 87% 50%;
+  --success: 120 100% 50%; /* Bright green for success */
 
-  --font-sans: Open Sans, sans-serif;
+  --warning: 48 100% 50%; /* Amber for warnings */
+
+  --input: 240 15% 20%;
+  --ring: 262 100% 70%;
+  --chart-1: 262 100% 75%;
+  --chart-2: 320 100% 75%;
+  --chart-3: 120 100% 60%;
+  --chart-4: 48 96% 65%;
+  --chart-5: 0 100% 65%;
+
+  --font-sans: 'Segoe UI', Arial, sans-serif;
   --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: .5rem; /* 8px */
-  --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.02);
-  --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.05);
-  --shadow-sm: 0px 2px 0px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
-  --shadow: 0px 2px 0px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
-  --shadow-md: 0px 2px 0px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.10);
-  --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.10);
-  --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.10);
-  --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.05);
-  --tracking-normal: 0em;
+  --font-mono: 'Courier New', monospace;
+  --radius: .375rem; /* Slightly tighter radius for LCARS */
+  --shadow-2xs: 0px 0px 10px hsl(262 100% 70% / 0.2);
+  --shadow-xs: 0px 0px 15px hsl(262 100% 70% / 0.3);
+  --shadow-sm: 0px 4px 15px hsl(262 100% 70% / 0.4);
+  --shadow: 0px 6px 20px hsl(262 100% 70% / 0.4);
+  --shadow-md: 0px 8px 25px hsl(262 100% 70% / 0.5);
+  --shadow-lg: 0px 10px 30px hsl(262 100% 70% / 0.6);
+  --shadow-xl: 0px 15px 40px hsl(262 100% 70% / 0.7);
+  --shadow-2xl: 0px 20px 50px hsl(262 100% 70% / 0.8);
+  --tracking-normal: 0.05em; /* Slightly wider letter spacing for LCARS */
   --spacing: 0.25rem;
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
@@ -122,115 +127,7 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-.dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-
-  --opaque-button-border-intensity: 9;  /* In terms of percentages */
-
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
-
-  --background: 240 10% 3.9%;
-
-  --foreground: 0 0% 88%;
-
-  --border: 240 8% 12%;
-
-  --card: 240 8% 6%;
-
-  --card-foreground: 0 0% 90%;
-
-  --card-border: 240 8% 9%;
-
-  --sidebar: 240 6% 9%;
-
-  --sidebar-foreground: 0 0% 92%;
-
-  --sidebar-border: 240 6% 12%;
-
-  --sidebar-primary: 262 100% 70%;
-
-  --sidebar-primary-foreground: 0 0% 100%;
-
-  --sidebar-accent: 240 5% 15%;
-
-  --sidebar-accent-foreground: 262 80% 85%;
-
-  --sidebar-ring: 262 100% 70%;
-
-  --popover: 240 6% 12%;
-
-  --popover-foreground: 0 0% 94%;
-
-  --popover-border: 240 6% 16%;
-
-  --primary: 262 100% 70%;
-
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 240 5% 18%;
-
-  --secondary-foreground: 0 0% 96%;
-
-  --muted: 262 8% 15%;
-
-  --muted-foreground: 262 8% 75%;
-
-  --accent: 320 12% 16%;
-
-  --accent-foreground: 320 12% 82%;
-
-  --destructive: 348 83% 47%;
-
-  --destructive-foreground: 0 0% 100%;
-
-  --input: 240 6% 25%;
-  --ring: 262 100% 70%;
-  --chart-1: 262 100% 75%;
-  --chart-2: 320 100% 75%;
-  --chart-3: 142 76% 65%;
-  --chart-4: 48 96% 65%;
-  --chart-5: 27 87% 65%;
-
-  --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.10);
-  --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.15);
-  --shadow-sm: 0px 2px 0px 0px hsl(0 0% 0% / 0.15), 0px 1px 2px -1px hsl(0 0% 0% / 0.25);
-  --shadow: 0px 2px 0px 0px hsl(0 0% 0% / 0.15), 0px 1px 2px -1px hsl(0 0% 0% / 0.25);
-  --shadow-md: 0px 2px 0px 0px hsl(0 0% 0% / 0.15), 0px 2px 4px -1px hsl(0 0% 0% / 0.25);
-  --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0.15), 0px 4px 6px -1px hsl(0 0% 0% / 0.25);
-  --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.15), 0px 8px 10px -1px hsl(0 0% 0% / 0.25);
-  --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.15);
-
-  /* Fallback for older browsers */
-  --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --sidebar-accent-border: hsl(var(--sidebar-accent));
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --primary-border: hsl(var(--primary));
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --secondary-border: hsl(var(--secondary));
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --muted-border: hsl(var(--muted));
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --accent-border: hsl(var(--accent));
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --destructive-border: hsl(var(--destructive));
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-}
+/* LCARS theme is dark-only (no light mode for spaceship interface) */
 
 @layer base {
   * {
@@ -312,5 +209,122 @@
   .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
+  }
+
+  /* LCARS Animations & Effects */
+  @keyframes lcars-scan {
+    0%, 100% {
+      transform: translateY(-100%);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(100%);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes lcars-pulse {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 10px hsl(var(--primary) / 0.5);
+    }
+    50% {
+      opacity: 0.7;
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.8);
+    }
+  }
+
+  @keyframes lcars-glow {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--primary) / 0.3), 0 0 10px hsl(var(--primary) / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 10px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--primary) / 0.4);
+    }
+  }
+
+  @keyframes lcars-flash {
+    0%, 50%, 100% {
+      opacity: 1;
+    }
+    25%, 75% {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes lcars-slide-in {
+    from {
+      transform: translateX(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .lcars-scan {
+    animation: lcars-scan 3s ease-in-out infinite;
+  }
+
+  .lcars-pulse {
+    animation: lcars-pulse 2s ease-in-out infinite;
+  }
+
+  .lcars-glow {
+    animation: lcars-glow 2s ease-in-out infinite;
+  }
+
+  .lcars-flash {
+    animation: lcars-flash 1s ease-in-out infinite;
+  }
+
+  .lcars-slide-in {
+    animation: lcars-slide-in 0.3s ease-out;
+  }
+
+  /* LCARS scanning effect container */
+  .lcars-scanner {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lcars-scanner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.3) 50%,
+      transparent 100%
+    );
+    animation: lcars-scan 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Starfield background */
+  .starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 75%, white, transparent),
+                radial-gradient(2px 2px at 79% 53%, white, transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
   }
 }
