@@ -1,3 +1,6 @@
+// IMPROVED_AIChat.tsx
+// Optimized with security, performance, and error handling improvements
+
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,13 +26,16 @@ interface Message {
   timestamp: Date;
 }
 
+// RATE LIMITER INSTANCES
+// Create outside component to persist across renders
+// Adjust these based on your Claude API plan
 const aiRateLimiter = new RateLimiter(
-  RATE_LIMITS.CLAUDE_AI.maxCalls,
+  RATE_LIMITS.CLAUDE_AI.maxCalls,     // 5 calls per minute (conservative for Claude API)
   RATE_LIMITS.CLAUDE_AI.timeWindow
 );
 
 const localRateLimiter = new RateLimiter(
-  RATE_LIMITS.LOCAL.maxCalls,
+  RATE_LIMITS.LOCAL.maxCalls,         // 30 calls per minute for local NLP
   RATE_LIMITS.LOCAL.timeWindow
 );
 
@@ -47,6 +53,7 @@ export default function AIChat() {
   const [rateLimitInfo, setRateLimitInfo] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // OPTIMIZATION: Memoize sentiment calculation
   const currentSentiment = useMemo<SentimentResult>(
     () => analyzeSentiment(input),
     [input]
@@ -56,17 +63,19 @@ export default function AIChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Update rate limit info periodically
   useEffect(() => {
     const updateRateLimit = () => {
       setRateLimitInfo(formatRateLimitStatus(aiRateLimiter));
     };
     
     updateRateLimit();
-    const interval = setInterval(updateRateLimit, 5000);
+    const interval = setInterval(updateRateLimit, 5000); // Update every 5 seconds
     
     return () => clearInterval(interval);
   }, []);
 
+  // Process voice commands from sessionStorage
   useEffect(() => {
     const voiceCommand = sessionStorage.getItem("voiceCommand");
     if (voiceCommand) {
@@ -81,6 +90,7 @@ export default function AIChat() {
     }
   }, []);
 
+  // OPTIMIZATION: Extract common NLP processing
   const processNaturalLanguage = useCallback(async (text: string): Promise<string> => {
     const lower = text.toLowerCase();
     let responses: string[] = [];
@@ -167,7 +177,9 @@ export default function AIChat() {
     return "I understand you're asking about: " + text + ". While I have basic natural language processing, adding a Claude AI API key will unlock much more powerful conversations and understanding. See the Settings panel for API configuration.";
   }, []);
 
+  // SECURITY & PERFORMANCE: Unified message processor
   const processMessage = useCallback(async (messageText: string) => {
+    // STEP 1: VALIDATION & SANITIZATION
     const validation = validateMessage(messageText, MESSAGE_LIMITS.LONG);
     
     if (!validation.valid) {
@@ -179,8 +191,11 @@ export default function AIChat() {
       return;
     }
 
+    // STEP 2: RATE LIMITING CHECK
+    // Try AI rate limiter first
     const useClaudeAPI = aiRateLimiter.canMakeCall();
     
+    // If Claude API is rate limited, check local NLP limiter
     if (!useClaudeAPI && !localRateLimiter.canMakeCall()) {
       const timeRemaining = aiRateLimiter.getTimeUntilNextCall();
       const seconds = Math.ceil(timeRemaining / 1000);
@@ -193,6 +208,7 @@ export default function AIChat() {
       return;
     }
 
+    // STEP 3: CREATE USER MESSAGE (with sanitized content)
     const userMessage: Message = {
       role: "user",
       content: validation.sanitized!,
@@ -207,6 +223,7 @@ export default function AIChat() {
       let aiResponse: string;
 
       if (useClaudeAPI) {
+        // TRY CLAUDE API WITH TIMEOUT
         try {
           console.log('🤖 Attempting Claude AI request...');
           
@@ -217,11 +234,12 @@ export default function AIChat() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ message: validation.sanitized }),
             },
-            TIMEOUTS.LONG
+            TIMEOUTS.LONG // 30 second timeout for AI responses
           );
 
           if (data.error && data.apiAvailable === false) {
             console.log('⚠️ Claude API not available, using local NLP');
+            // Use local rate limiter for fallback
             if (!localRateLimiter.canMakeCall()) {
               throw new Error('Local NLP rate limit exceeded');
             }
@@ -233,6 +251,7 @@ export default function AIChat() {
         } catch (apiError) {
           console.error('❌ Claude API error:', apiError);
           
+          // Fallback to local NLP
           if (!localRateLimiter.canMakeCall()) {
             throw new Error('Both AI and local NLP rate limits exceeded');
           }
@@ -251,10 +270,12 @@ export default function AIChat() {
           aiResponse = await processNaturalLanguage(validation.sanitized!);
         }
       } else {
+        // USE LOCAL NLP (rate limited separately)
         console.log('🔄 Using local NLP (Claude API rate limited)');
         aiResponse = await processNaturalLanguage(validation.sanitized!);
       }
 
+      // STEP 4: ADD AI RESPONSE
       const assistantMessage: Message = {
         role: "assistant",
         content: aiResponse,
@@ -262,6 +283,8 @@ export default function AIChat() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      
+      // Update rate limit display
       setRateLimitInfo(formatRateLimitStatus(aiRateLimiter));
 
     } catch (error) {
@@ -275,6 +298,7 @@ export default function AIChat() {
         variant: "destructive",
       });
 
+      // Add error message to chat
       const errorMessage: Message = {
         role: "assistant",
         content: `⚠️ Error: ${errorInfo.userMessage}. Please try again.`,
@@ -312,6 +336,7 @@ export default function AIChat() {
         </p>
       </div>
 
+      {/* Rate Limit Status Banner */}
       {rateLimitInfo && (
         <Card className="bg-muted/50 border-primary/20">
           <CardContent className="py-3 px-4 flex items-center gap-2 text-sm">
@@ -321,6 +346,7 @@ export default function AIChat() {
         </Card>
       )}
 
+      {/* Quick Actions */}
       <Card className="lcars-scanner">
         <CardHeader>
           <CardTitle className="text-sm text-primary">Quick Questions</CardTitle>
@@ -361,6 +387,7 @@ export default function AIChat() {
         </CardContent>
       </Card>
 
+      {/* Chat Messages */}
       <Card className="lcars-scanner">
         <CardContent className="p-6">
           <div className="h-96 overflow-y-auto mb-4 space-y-4" data-testid="chat-messages">
@@ -433,6 +460,7 @@ export default function AIChat() {
         </CardContent>
       </Card>
 
+      {/* AI Capabilities */}
       <Card className="lcars-scanner">
         <CardHeader>
           <CardTitle className="text-primary flex items-center gap-2">
