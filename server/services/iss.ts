@@ -1,7 +1,7 @@
 // ISS tracker service (free, no API key required)
 export async function getISSLocation() {
   try {
-    const response = await fetch("http://api.open-notify.org/iss-now.json");
+    const response = await fetch("https://api.open-notify.org/iss-now.json");
     
     if (!response.ok) {
       throw new Error(`ISS API error: ${response.status}`);
