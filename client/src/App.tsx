@@ -124,41 +124,50 @@ export default function App() {
     }
     
     // Navigation commands (simple panel switching)
-    if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("dashboard")) {
+    // Support both "open/show [panel]" and just "[panel]" for convenience
+    if (lowerCommand.includes("dashboard") || lowerCommand.includes("home")) {
       setLocation("/");
       toast({ title: "Voice Command", description: "Opening Dashboard" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("task")) {
+      return;
+    } else if (lowerCommand.includes("task")) {
       setLocation("/tasks");
       toast({ title: "Voice Command", description: "Opening Task Manager" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("calendar")) {
+      return;
+    } else if (lowerCommand.includes("calendar")) {
       setLocation("/calendar");
       toast({ title: "Voice Command", description: "Opening Calendar" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("analytics")) {
+      return;
+    } else if (lowerCommand.includes("analytics")) {
       setLocation("/analytics");
       toast({ title: "Voice Command", description: "Opening Analytics" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("space")) {
+      return;
+    } else if (lowerCommand.includes("space")) {
       setLocation("/space");
       toast({ title: "Voice Command", description: "Opening Space Panel" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && (lowerCommand.includes("travel") || lowerCommand.includes("route"))) {
+      return;
+    } else if (lowerCommand.includes("travel") || lowerCommand.includes("route")) {
       setLocation("/travel");
       toast({ title: "Voice Command", description: "Opening Travel Calculator" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("notification")) {
+      return;
+    } else if (lowerCommand.includes("notification")) {
       setLocation("/notifications");
       toast({ title: "Voice Command", description: "Opening Notifications" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && (lowerCommand.includes("terminal") || lowerCommand.includes("console"))) {
+      return;
+    } else if (lowerCommand.includes("terminal") || lowerCommand.includes("console")) {
       setLocation("/terminal");
       toast({ title: "Voice Command", description: "Opening Terminal" });
-    } else if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("settings")) {
+      return;
+    } else if (lowerCommand.includes("settings")) {
       setLocation("/settings");
       toast({ title: "Voice Command", description: "Opening Settings" });
-    }
-    // Weather queries
-    else if (lowerCommand.includes("weather")) {
+      return;
+    } else if (lowerCommand.includes("weather")) {
       setLocation("/weather");
       toast({ 
         title: "🌤️ Weather Request", 
         description: "Opening Weather Panel with current conditions"
       });
+      return;
     }
     // AI queries - Send everything else to AI Chat
     else {
