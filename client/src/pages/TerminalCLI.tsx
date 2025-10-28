@@ -53,6 +53,12 @@ export default function TerminalCLI() {
         addOutput("  calc <expr>       - Calculate expression", "text-foreground");
         addOutput("  echo <text>       - Echo text", "text-foreground");
         addOutput("", "");
+        addOutput("Easter Eggs:", "text-primary");
+        addOutput("  redshirt          - Random redshirt fate", "text-foreground");
+        addOutput("  khan              - KHAAAAN!", "text-foreground");
+        addOutput("  beam              - Transporter effect", "text-foreground");
+        addOutput("  cowsay <msg>      - Make a cow say something", "text-foreground");
+        addOutput("", "");
         break;
 
       case "clear":
@@ -146,6 +152,69 @@ export default function TerminalCLI() {
       case "echo":
         const text = cmd.substring(5);
         addOutput(text, "text-foreground");
+        break;
+
+      case "redshirt":
+        const fates = [
+          "💀 Killed by alien life form on away mission",
+          "⚡ Vaporized by unknown energy weapon",
+          "🪨 Crushed by falling rocks on Class M planet",
+          "👾 Assimilated by the Borg",
+          "🌌 Lost in transporter malfunction",
+          "🔥 Consumed by plasma fire",
+          "✨ Actually survived! (Rare outcome)"
+        ];
+        addOutput("🔴 Beaming down redshirt...", "text-destructive");
+        setTimeout(() => {
+          const fate = fates[Math.floor(Math.random() * fates.length)];
+          setOutput((prev) => [...prev, { 
+            text: fate, 
+            color: fate.includes("survived") ? "text-success" : "text-destructive" 
+          }]);
+          setOutput((prev) => [...prev, { text: "", color: "" }]);
+        }, 1000);
+        break;
+
+      case "khan":
+        addOutput("", "");
+        addOutput("🗣️  KHAAAAAAAAAAAAAN!", "text-destructive");
+        addOutput("   KHAAAAAAAAAAAAAAN!", "text-destructive");
+        addOutput("     KHAAAAAAAAAAN!", "text-destructive");
+        addOutput("", "");
+        addOutput("   - Captain James T. Kirk", "text-muted-foreground");
+        addOutput("", "");
+        break;
+
+      case "beam":
+        addOutput("⚡ Energizing...", "text-warning");
+        addOutput("█████████████████████", "text-primary");
+        setTimeout(() => {
+          setOutput((prev) => [...prev, { text: "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓", color: "text-primary" }]);
+        }, 200);
+        setTimeout(() => {
+          setOutput((prev) => [...prev, { text: "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒", color: "text-primary" }]);
+        }, 400);
+        setTimeout(() => {
+          setOutput((prev) => [...prev, { text: "░░░░░░░░░░░░░░░░░░░░░", color: "text-primary" }]);
+        }, 600);
+        setTimeout(() => {
+          setOutput((prev) => [...prev, { text: "✨ Transport complete!", color: "text-success" }]);
+          setOutput((prev) => [...prev, { text: "", color: "" }]);
+        }, 800);
+        break;
+
+      case "cowsay":
+        const message = cmd.substring(7).trim() || "Moo!";
+        addOutput("", "");
+        addOutput(" " + "_".repeat(message.length + 2), "text-foreground");
+        addOutput("< " + message + " >", "text-foreground");
+        addOutput(" " + "-".repeat(message.length + 2), "text-foreground");
+        addOutput("        \\   ^__^", "text-foreground");
+        addOutput("         \\  (oo)\\_______", "text-foreground");
+        addOutput("            (__)\\       )\\/\\", "text-foreground");
+        addOutput("                ||----w |", "text-foreground");
+        addOutput("                ||     ||", "text-foreground");
+        addOutput("", "");
         break;
 
       default:
