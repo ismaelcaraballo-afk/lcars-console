@@ -4,11 +4,12 @@ The LCARS AI Console features **Star Trek-style voice recognition with AI integr
 
 ## 🚀 What Makes This Special
 
-Unlike simple voice navigation, the LCARS voice system is **AI-powered**:
+Unlike simple voice navigation, the LCARS voice system is **AI-powered with voice responses**:
 - ✅ Ask **any question** - it goes to AI Chat for intelligent responses
 - ✅ Navigate panels with simple commands
 - ✅ Check weather, tasks, or any information
 - ✅ Natural conversation - no rigid command syntax needed!
+- ✅ **Voice feedback** - The computer speaks back to you, just like in Star Trek!
 
 ## How to Use Voice Control
 
@@ -30,6 +31,7 @@ Computer, [your request or question]
 - **Navigation commands** → Opens the requested panel
 - **Questions or requests** → Opens AI Chat and automatically processes your question
 - **Weather queries** → Opens Weather Panel with current data
+- **Voice feedback** → The computer speaks back to confirm your command!
 - A confirmation beep plays for all commands
 - Toast notifications show what action was taken
 
@@ -122,36 +124,43 @@ Examples:
 ### Scenario 1: Simple Navigation
 ```
 You: "Computer, open weather"
-LCARS: *beep* "Voice Command: Opening Weather Panel"
+LCARS: *beep* 🔊 "Opening weather panel"
 Result: Weather panel displays with 7-day forecast
 ```
 
 ### Scenario 2: Ask a Question (AI-Powered!)
 ```
 You: "Computer, what's the meaning of life?"
-LCARS: *beep* "🤖 Processing with AI: Opening AI Chat..."
+LCARS: *beep* 🔊 "Processing with AI"
 Result: AI Chat opens and responds: "The meaning of life is a philosophical question..."
 ```
 
 ### Scenario 3: Natural Conversation
 ```
 You: "Computer, tell me something interesting about space"
-LCARS: *beep* "🤖 Processing with AI..."
+LCARS: *beep* 🔊 "Processing with AI"
 Result: AI provides fascinating space facts
 ```
 
-### Scenario 4: System Status
+### Scenario 4: Task Creation
 ```
-You: "Computer, system diagnostics"
-LCARS: *beep* "🤖 Processing with AI..."
-Result: AI reports all systems operational with details
+You: "Computer, create task review quarterly report"
+LCARS: *beep* 🔊 "Task created: review quarterly report"
+Result: Task Manager opens showing your new task
 ```
 
-### Scenario 5: Weather Query
+### Scenario 5: Captain Quote
 ```
-You: "Computer, what's the weather in Tokyo?"
-LCARS: *beep* "🤖 Processing with AI..."
-Result: AI provides weather information for Tokyo
+You: "Computer, Picard"
+LCARS: *beep* 🔊 "Opening terminal for Picard quote"
+Result: Terminal opens with an inspiring Picard quote
+```
+
+### Scenario 6: Multi-Panel View
+```
+You: "Computer, show me weather and tasks"
+LCARS: *beep* 🔊 "Opening 2 panels"
+Result: Split-screen view with weather and tasks side-by-side
 ```
 
 ## Browser Compatibility

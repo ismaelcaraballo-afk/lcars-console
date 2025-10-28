@@ -6,6 +6,11 @@ The LCARS AI Console is a Star Trek-themed productivity dashboard that combines 
 
 The application emphasizes a "works out of the box" philosophy - core features like weather, space data, and ISS tracking use free APIs with no configuration required, while advanced features (AI chat, maps) are ready to activate with API keys.
 
+**Key Features:**
+- **Voice Control with Text-to-Speech**: Star Trek-style voice commands starting with "Computer" - the system speaks back to confirm actions, navigate panels, create tasks, and answer questions using AI integration
+- **Multi-Panel Split View**: Request multiple panels simultaneously via voice (e.g., "Computer show me weather and tasks") for side-by-side comparison
+- **AI-Powered Assistance**: Natural language processing for questions and commands, with Claude AI integration for advanced responses
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
