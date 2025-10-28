@@ -26,6 +26,7 @@ import NotificationsPage from "@/pages/NotificationsPage";
 import TerminalCLI from "@/pages/TerminalCLI";
 import AIChat from "@/pages/AIChat";
 import Settings from "@/pages/Settings";
+import MultiView from "@/pages/MultiView";
 
 function Router() {
   return (
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/terminal" component={TerminalCLI} />
       <Route path="/ai" component={AIChat} />
       <Route path="/settings" component={Settings} />
+      <Route path="/multi-view" component={MultiView} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -121,6 +123,38 @@ export default function App() {
         sessionStorage.setItem("terminalCommand", captain);
         return;
       }
+    }
+    
+    // Detect multiple panel requests for multi-view
+    const panelKeywords = [
+      { keyword: "task", panel: "tasks" },
+      { keyword: "weather", panel: "weather" },
+      { keyword: "calendar", panel: "calendar" },
+      { keyword: "analytics", panel: "analytics" },
+      { keyword: "space", panel: "space" },
+      { keyword: "travel", panel: "travel" },
+      { keyword: "notification", panel: "notifications" },
+      { keyword: "terminal", panel: "terminal" },
+      { keyword: "ai", panel: "ai" },
+    ];
+    
+    const detectedPanels: string[] = [];
+    panelKeywords.forEach(({ keyword, panel }) => {
+      if (lowerCommand.includes(keyword)) {
+        detectedPanels.push(panel);
+      }
+    });
+    
+    // If 2 or more panels detected, use multi-view (deduplicate and limit to 4)
+    if (detectedPanels.length >= 2) {
+      const uniquePanels = [...new Set(detectedPanels)].slice(0, 4);
+      const panelsParam = uniquePanels.join(",");
+      setLocation(`/multi-view?panels=${panelsParam}`);
+      toast({ 
+        title: "Multi-Panel View", 
+        description: `Opening ${uniquePanels.length} panels: ${uniquePanels.join(", ")}`
+      });
+      return;
     }
     
     // Navigation commands (simple panel switching)
