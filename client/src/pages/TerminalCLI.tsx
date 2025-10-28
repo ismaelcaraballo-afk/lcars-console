@@ -21,6 +21,18 @@ export default function TerminalCLI() {
     }
   }, [output]);
 
+  // Check for voice-triggered terminal commands
+  useEffect(() => {
+    const terminalCommand = sessionStorage.getItem("terminalCommand");
+    if (terminalCommand) {
+      sessionStorage.removeItem("terminalCommand");
+      // Execute the command after a brief delay
+      setTimeout(() => {
+        handleCommand(terminalCommand);
+      }, 500);
+    }
+  }, []);
+
   const addOutput = (text: string, color: string = "text-foreground") => {
     setOutput((prev) => [...prev, { text, color }]);
   };
@@ -50,6 +62,10 @@ export default function TerminalCLI() {
         addOutput("  fortune           - Get a fortune", "text-foreground");
         addOutput("  spock             - Spock quote", "text-foreground");
         addOutput("  picard            - Picard quote", "text-foreground");
+        addOutput("  sisko             - Sisko quote", "text-foreground");
+        addOutput("  janeway           - Janeway quote", "text-foreground");
+        addOutput("  archer            - Archer quote", "text-foreground");
+        addOutput("  mariner           - Mariner quote", "text-foreground");
         addOutput("  calc <expr>       - Calculate expression", "text-foreground");
         addOutput("  echo <text>       - Echo text", "text-foreground");
         addOutput("", "");
@@ -131,8 +147,58 @@ export default function TerminalCLI() {
           "👨‍✈️ 'Engage!'",
           "👨‍✈️ 'Tea. Earl Grey. Hot.'",
           "👨‍✈️ 'Things are only impossible until they're not.'",
+          "👨‍✈️ 'The line must be drawn here!'",
+          "👨‍✈️ 'There are four lights!'"
         ];
         addOutput(picardQuotes[Math.floor(Math.random() * picardQuotes.length)], "text-primary");
+        break;
+
+      case "sisko":
+        const siskoQuotes = [
+          "⚾ 'It's easy to be a saint in paradise.'",
+          "⚾ 'I can live with it.'",
+          "⚾ 'If you want to know who you are, it's important to know who you were.'",
+          "⚾ 'Sometimes the only way to save a life is to take one.'",
+          "⚾ 'I am far more than just another Starfleet captain.'",
+          "⚾ 'In the Pale Moonlight...'"
+        ];
+        addOutput(siskoQuotes[Math.floor(Math.random() * siskoQuotes.length)], "text-primary");
+        break;
+
+      case "janeway":
+        const janewayQuotes = [
+          "☕ 'Coffee. Black.'",
+          "☕ 'There's coffee in that nebula!'",
+          "☕ 'Do it.'",
+          "☕ 'We're Starfleet officers. Weird is part of the job.'",
+          "☕ 'Time's up!'",
+          "☕ 'I don't break rules, but I bend them... a lot.'"
+        ];
+        addOutput(janewayQuotes[Math.floor(Math.random() * janewayQuotes.length)], "text-primary");
+        break;
+
+      case "archer":
+        const archerQuotes = [
+          "🐕 'Let's see what's out there.'",
+          "🐕 'We're going to stumble, make mistakes... but we're going to keep going.'",
+          "🐕 'Where no man has gone before.'",
+          "🐕  'We can't turn tail every time we get slapped.'",
+          "🐕 'Someday, my people are going to come up with some sort of a doctrine.'",
+          "🐕 'This is why we're out here, Doctor.'"
+        ];
+        addOutput(archerQuotes[Math.floor(Math.random() * archerQuotes.length)], "text-primary");
+        break;
+
+      case "mariner":
+        const marinerQuotes = [
+          "🍺 'Second contact is where the magic happens!'",
+          "🍺 'I know every loophole, every exploit, every-'",
+          "🍺 'Actually, that's pretty badass.'",
+          "🍺 'Don't overthink it!'",
+          "🍺 'We're the Cerritos! We're the best at being the worst!'",
+          "🍺 'Classic Starfleet hubris.'"
+        ];
+        addOutput(marinerQuotes[Math.floor(Math.random() * marinerQuotes.length)], "text-primary");
         break;
 
       case "calc":

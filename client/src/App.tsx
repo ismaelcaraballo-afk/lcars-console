@@ -108,6 +108,21 @@ export default function App() {
       return;
     }
     
+    // Captain quote commands (Star Trek Easter eggs!)
+    const captainCommands = ["spock", "picard", "sisko", "janeway", "archer", "mariner"];
+    for (const captain of captainCommands) {
+      if (lowerCommand.includes(captain)) {
+        setLocation("/terminal");
+        toast({ 
+          title: "🖖 Captain Quote", 
+          description: `Opening Terminal for ${captain.charAt(0).toUpperCase() + captain.slice(1)} quote...`
+        });
+        // Store command for terminal to execute
+        sessionStorage.setItem("terminalCommand", captain);
+        return;
+      }
+    }
+    
     // Navigation commands (simple panel switching)
     if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("dashboard")) {
       setLocation("/");

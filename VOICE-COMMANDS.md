@@ -74,6 +74,25 @@ Computer, [your request or question]
 | "Computer, open terminal" | Opens Terminal/CLI |
 | "Computer, open settings" | Opens Settings |
 
+### 🖖 Star Trek Captain Quotes (Easter Eggs!)
+
+Get inspiring quotes from your favorite Star Trek captains! Just say their name:
+
+| Say This | What Happens |
+|----------|-------------|
+| "Computer, Spock" | Random Spock quote (Logic and wisdom) |
+| "Computer, Picard" | Random Picard quote (TNG) |
+| "Computer, Sisko" | Random Sisko quote (DS9) |
+| "Computer, Janeway" | Random Janeway quote (Voyager) |
+| "Computer, Archer" | Random Archer quote (Enterprise) |
+| "Computer, Mariner" | Random Mariner quote (Lower Decks) |
+
+**Examples:**
+- "Computer, Picard" → Hear "Make it so." or "Engage!"
+- "Computer, Janeway" → Coffee quotes and Delta Quadrant wisdom
+- "Computer, Sisko" → Deep Space Nine philosophical moments
+- "Computer, Mariner" → Lower Decks humor and insights
+
 ### 🤖 AI-Powered Commands (Intelligent Processing)
 
 **Any question or request you ask gets sent to the AI for intelligent processing!**
