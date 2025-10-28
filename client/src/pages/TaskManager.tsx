@@ -25,6 +25,7 @@ export default function TaskManager() {
     title: "",
     description: "",
     priority: "medium",
+    status: "active",
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   });
 
@@ -52,6 +53,7 @@ export default function TaskManager() {
         title: "",
         description: "",
         priority: "medium",
+        status: "active",
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       });
     },

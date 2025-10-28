@@ -35,6 +35,26 @@ Computer, [your request or question]
 
 ## Supported Voice Commands
 
+### 📋 Task Management Commands (Create Tasks by Voice!)
+
+| Say This | What Happens |
+|----------|-------------|
+| "Computer, add task [task name]" | Creates a new task with medium priority |
+| "Computer, create task [task name]" | Creates a new task with medium priority |
+| "Computer, new task [task name]" | Creates a new task with medium priority |
+
+**Examples:**
+- "Computer, add task review project documentation"
+- "Computer, create task buy groceries"
+- "Computer, new task finish quarterly report"
+
+**What it does:**
+- Creates task with the specified title
+- Sets priority to **medium** (you can change it later in UI)
+- Sets due date to **7 days from now**
+- Opens Task Manager to show your new task
+- Plays confirmation beep and shows success message
+
 ### 🧭 Navigation Commands (Direct Panel Access)
 
 | Say This | What Happens |
@@ -252,8 +272,13 @@ The system still works with built-in natural language processing:
 
 ## Future Voice Features (Planned)
 
+✅ **Recently Added:**
+- ✅ Voice task creation: "Computer, create task [name]" - **NOW AVAILABLE!**
+
 🚧 **Coming Soon:**
-- Voice task creation: "Computer, create task called [name]"
+- Voice task completion: "Computer, complete task [name]"
+- Voice task deletion: "Computer, delete task [name]"
+- Voice calendar events: "Computer, add event [name] on [date]"
 - Voice email/messaging: "Computer, send message to..."
 - Voice settings: "Computer, change theme"
 - Custom wake words beyond "Computer"

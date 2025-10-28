@@ -1,5 +1,5 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
+import { queryClient, apiRequest } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -59,6 +59,54 @@ export default function App() {
   // Voice recognition integration - Enhanced AI-powered command processing
   const handleVoiceCommand = async (command: string) => {
     const lowerCommand = command.toLowerCase();
+    
+    // Task creation commands
+    if (lowerCommand.includes("add task") || lowerCommand.includes("create task") || lowerCommand.includes("new task")) {
+      let taskTitle = "";
+      
+      if (lowerCommand.includes("add task")) {
+        taskTitle = command.substring(command.toLowerCase().indexOf("add task") + 8).trim();
+      } else if (lowerCommand.includes("create task")) {
+        taskTitle = command.substring(command.toLowerCase().indexOf("create task") + 11).trim();
+      } else if (lowerCommand.includes("new task")) {
+        taskTitle = command.substring(command.toLowerCase().indexOf("new task") + 8).trim();
+      }
+      
+      if (taskTitle) {
+        try {
+          await apiRequest("POST", "/api/tasks", {
+            title: taskTitle,
+            description: "",
+            priority: "medium",
+            status: "active",
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          });
+          
+          // Invalidate tasks cache to refresh the UI
+          await queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+          
+          setLocation("/tasks");
+          toast({ 
+            title: "✅ Task Created", 
+            description: `Added: "${taskTitle}"`,
+          });
+        } catch (error) {
+          console.error("Voice task creation error:", error);
+          toast({ 
+            title: "Error", 
+            description: "Failed to create task via voice command",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({ 
+          title: "Invalid Command", 
+          description: 'Say "Computer, add task [task name]"',
+          variant: "destructive"
+        });
+      }
+      return;
+    }
     
     // Navigation commands (simple panel switching)
     if ((lowerCommand.includes("open") || lowerCommand.includes("show")) && lowerCommand.includes("dashboard")) {
