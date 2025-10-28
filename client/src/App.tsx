@@ -88,12 +88,14 @@ export default function App() {
           await queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
           
           setLocation("/tasks");
+          speak(`Task created: ${taskTitle}`);
           toast({ 
             title: "✅ Task Created", 
             description: `Added: "${taskTitle}"`,
           });
         } catch (error) {
           console.error("Voice task creation error:", error);
+          speak("Error creating task");
           toast({ 
             title: "Error", 
             description: "Failed to create task via voice command",
@@ -101,6 +103,7 @@ export default function App() {
           });
         }
       } else {
+        speak("Invalid command. Please specify a task name.");
         toast({ 
           title: "Invalid Command", 
           description: 'Say "Computer, add task [task name]"',
@@ -114,10 +117,12 @@ export default function App() {
     const captainCommands = ["spock", "picard", "sisko", "janeway", "archer", "mariner"];
     for (const captain of captainCommands) {
       if (lowerCommand.includes(captain)) {
+        const captainName = captain.charAt(0).toUpperCase() + captain.slice(1);
         setLocation("/terminal");
+        speak(`Opening terminal for ${captainName} quote`);
         toast({ 
           title: "🖖 Captain Quote", 
-          description: `Opening Terminal for ${captain.charAt(0).toUpperCase() + captain.slice(1)} quote...`
+          description: `Opening Terminal for ${captainName} quote...`
         });
         // Store command for terminal to execute
         sessionStorage.setItem("terminalCommand", captain);
@@ -150,6 +155,7 @@ export default function App() {
       const uniquePanels = [...new Set(detectedPanels)].slice(0, 4);
       const panelsParam = uniquePanels.join(",");
       setLocation(`/multi-view?panels=${panelsParam}`);
+      speak(`Opening ${uniquePanels.length} panels`);
       toast({ 
         title: "Multi-Panel View", 
         description: `Opening ${uniquePanels.length} panels: ${uniquePanels.join(", ")}`
@@ -161,42 +167,52 @@ export default function App() {
     // Support both "open/show [panel]" and just "[panel]" for convenience
     if (lowerCommand.includes("dashboard") || lowerCommand.includes("home")) {
       setLocation("/");
+      speak("Opening dashboard");
       toast({ title: "Voice Command", description: "Opening Dashboard" });
       return;
     } else if (lowerCommand.includes("task")) {
       setLocation("/tasks");
+      speak("Opening task manager");
       toast({ title: "Voice Command", description: "Opening Task Manager" });
       return;
     } else if (lowerCommand.includes("calendar")) {
       setLocation("/calendar");
+      speak("Opening calendar");
       toast({ title: "Voice Command", description: "Opening Calendar" });
       return;
     } else if (lowerCommand.includes("analytics")) {
       setLocation("/analytics");
+      speak("Opening analytics");
       toast({ title: "Voice Command", description: "Opening Analytics" });
       return;
     } else if (lowerCommand.includes("space")) {
       setLocation("/space");
+      speak("Opening space exploration");
       toast({ title: "Voice Command", description: "Opening Space Panel" });
       return;
     } else if (lowerCommand.includes("travel") || lowerCommand.includes("route")) {
       setLocation("/travel");
+      speak("Opening travel calculator");
       toast({ title: "Voice Command", description: "Opening Travel Calculator" });
       return;
     } else if (lowerCommand.includes("notification")) {
       setLocation("/notifications");
+      speak("Opening notifications");
       toast({ title: "Voice Command", description: "Opening Notifications" });
       return;
     } else if (lowerCommand.includes("terminal") || lowerCommand.includes("console")) {
       setLocation("/terminal");
+      speak("Opening terminal");
       toast({ title: "Voice Command", description: "Opening Terminal" });
       return;
     } else if (lowerCommand.includes("settings")) {
       setLocation("/settings");
+      speak("Opening settings");
       toast({ title: "Voice Command", description: "Opening Settings" });
       return;
     } else if (lowerCommand.includes("weather")) {
       setLocation("/weather");
+      speak("Opening weather panel");
       toast({ 
         title: "🌤️ Weather Request", 
         description: "Opening Weather Panel with current conditions"
@@ -206,6 +222,7 @@ export default function App() {
     // AI queries - Send everything else to AI Chat
     else {
       setLocation("/ai");
+      speak("Processing with AI");
       toast({ 
         title: "🤖 Processing with AI", 
         description: "Opening AI Chat to answer your question..."
@@ -355,5 +372,33 @@ function playBeep(frequency: number, duration: number = 50) {
   }
 }
 
-// Make playBeep globally available
+function speak(text: string) {
+  try {
+    // Cancel any ongoing speech
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0; // Normal speed
+    utterance.pitch = 1.0; // Normal pitch
+    utterance.volume = 0.8; // Slightly quieter than max
+    
+    // Use a more computer-like voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => 
+      v.name.includes("Google") || v.name.includes("Microsoft") || v.name.includes("Samantha")
+    );
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    
+    window.speechSynthesis.speak(utterance);
+  } catch (error) {
+    console.debug("Speech synthesis not supported", error);
+  }
+}
+
+// Make playBeep and speak globally available
 (window as any).playBeep = playBeep;
+(window as any).speak = speak;
