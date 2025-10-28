@@ -1,0 +1,454 @@
+// utilities.ts
+// Security, Performance, and API Utilities for LCARS Console
+
+/**
+ * SECURITY UTILITIES
+ */
+
+/**
+ * Sanitizes user input to prevent XSS attacks
+ * Escapes HTML entities by converting to text content
+ */
+export const sanitizeInput = (text: string): string => {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+};
+
+/**
+ * Validates message input with length and type checks
+ */
+export const validateMessage = (
+  text: string, 
+  maxLength: number = 1000
+): { valid: boolean; error?: string; sanitized?: string } => {
+  if (!text || typeof text !== 'string') {
+    return { valid: false, error: 'Invalid input type' };
+  }
+  
+  const trimmed = text.trim();
+  
+  if (trimmed.length === 0) {
+    return { valid: false, error: 'Message cannot be empty' };
+  }
+  
+  if (trimmed.length > maxLength) {
+    return { valid: false, error: `Message too long (max ${maxLength} characters)` };
+  }
+  
+  // Check for suspicious patterns (optional extra security)
+  const suspiciousPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /on\w+\s*=/i, // onclick, onerror, etc.
+  ];
+  
+  for (const pattern of suspiciousPatterns) {
+    if (pattern.test(trimmed)) {
+      return { valid: false, error: 'Message contains invalid content' };
+    }
+  }
+  
+  return { valid: true, sanitized: sanitizeInput(trimmed) };
+};
+
+/**
+ * PERFORMANCE UTILITIES
+ */
+
+/**
+ * Rate Limiter Class
+ * Prevents API spam and protects against excessive requests
+ * 
+ * Example usage:
+ *   const limiter = new RateLimiter(10, 60000); // 10 calls per minute
+ *   if (limiter.canMakeCall()) { // make API call }
+ */
+export class RateLimiter {
+  private calls: number[] = [];
+  
+  constructor(
+    private maxCalls: number = 10,
+    private timeWindow: number = 60000 // 1 minute default
+  ) {}
+  
+  /**
+   * Check if a new call can be made within rate limit
+   * Automatically cleans up old call timestamps
+   */
+  canMakeCall(): boolean {
+    const now = Date.now();
+    
+    // Remove calls outside the time window
+    this.calls = this.calls.filter(time => now - time < this.timeWindow);
+    
+    if (this.calls.length < this.maxCalls) {
+      this.calls.push(now);
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Get number of remaining calls in current window
+   */
+  getRemainingCalls(): number {
+    const now = Date.now();
+    this.calls = this.calls.filter(time => now - time < this.timeWindow);
+    return Math.max(0, this.maxCalls - this.calls.length);
+  }
+  
+  /**
+   * Get time until next call is available (in milliseconds)
+   */
+  getTimeUntilNextCall(): number {
+    if (this.calls.length < this.maxCalls) {
+      return 0;
+    }
+    
+    const now = Date.now();
+    const oldestCall = Math.min(...this.calls);
+    const timeUntilExpiry = (oldestCall + this.timeWindow) - now;
+    
+    return Math.max(0, timeUntilExpiry);
+  }
+  
+  /**
+   * Reset all rate limit counters
+   */
+  reset(): void {
+    this.calls = [];
+  }
+  
+  /**
+   * Get current status for debugging/display
+   */
+  getStatus(): { 
+    used: number; 
+    remaining: number; 
+    maxCalls: number;
+    timeWindow: number;
+    nextAvailable: number;
+  } {
+    const now = Date.now();
+    this.calls = this.calls.filter(time => now - time < this.timeWindow);
+    
+    return {
+      used: this.calls.length,
+      remaining: this.getRemainingCalls(),
+      maxCalls: this.maxCalls,
+      timeWindow: this.timeWindow,
+      nextAvailable: this.getTimeUntilNextCall(),
+    };
+  }
+}
+
+/**
+ * Fetch with timeout protection
+ * Prevents requests from hanging indefinitely
+ */
+export const fetchWithTimeout = async (
+  url: string, 
+  options: RequestInit = {}, 
+  timeout: number = 10000
+): Promise<Response> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return response;
+    
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - please try again');
+      }
+      throw error;
+    }
+    
+    throw new Error('Unknown error occurred');
+  }
+};
+
+/**
+ * Safe JSON fetch with timeout and error handling
+ */
+export const safeFetchJSON = async <T = any>(
+  url: string,
+  options: RequestInit = {},
+  timeout: number = 10000
+): Promise<T> => {
+  const response = await fetchWithTimeout(url, options, timeout);
+  
+  try {
+    return await response.json();
+  } catch (error) {
+    throw new Error('Invalid JSON response from server');
+  }
+};
+
+/**
+ * Debounce function - delays execution until after wait period
+ * Useful for search inputs, auto-save, etc.
+ */
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  delay: number = 300
+): ((...args: Parameters<T>) => void) => {
+  let timeoutId: NodeJS.Timeout;
+  
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
+
+/**
+ * Throttle function - limits execution rate
+ * Useful for scroll events, resize handlers, etc.
+ */
+export const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  limit: number = 100
+): ((...args: Parameters<T>) => void) => {
+  let inThrottle: boolean;
+  
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      
+      setTimeout(() => {
+        inThrottle = false;
+      }, limit);
+    }
+  };
+};
+
+/**
+ * SENTIMENT ANALYSIS (Optimized)
+ */
+
+// Move word lists outside functions for better performance
+const POSITIVE_WORDS = new Set([
+  "good", "great", "awesome", "amazing", "excellent", 
+  "happy", "love", "perfect", "wonderful", "fantastic",
+  "brilliant", "outstanding", "superb", "terrific", "marvelous",
+  "delightful", "fabulous", "spectacular", "phenomenal", "incredible",
+  "nice", "pleasant", "enjoyable", "satisfying", "pleased"
+]);
+
+const NEGATIVE_WORDS = new Set([
+  "bad", "terrible", "awful", "hate", "worst", 
+  "horrible", "sad", "angry", "disappointing", "poor",
+  "awful", "dreadful", "atrocious", "abysmal", "appalling",
+  "miserable", "pathetic", "useless", "frustrating", "annoying",
+  "upset", "unhappy", "dissatisfied", "displeased"
+]);
+
+export interface SentimentResult {
+  mood: 'positive' | 'neutral' | 'negative';
+  score: number;
+  icon: string;
+  confidence: number; // 0-1
+}
+
+/**
+ * Analyzes sentiment of text
+ * Optimized with O(n) complexity using Set lookups
+ */
+export const analyzeSentiment = (text: string): SentimentResult => {
+  let score = 0;
+  let wordCount = 0;
+  
+  // Split into words and clean
+  const words = text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ') // Remove punctuation
+    .split(/\s+/)
+    .filter(word => word.length > 2); // Ignore very short words
+  
+  // O(n) complexity - each word checked once
+  for (const word of words) {
+    wordCount++;
+    if (POSITIVE_WORDS.has(word)) score += 10;
+    if (NEGATIVE_WORDS.has(word)) score -= 10;
+  }
+  
+  // Calculate confidence based on number of sentiment words found
+  const sentimentWordsFound = Math.abs(score) / 10;
+  const confidence = Math.min(sentimentWordsFound / Math.max(wordCount, 1), 1);
+  
+  let mood: 'positive' | 'neutral' | 'negative' = "neutral";
+  let icon = "😐";
+  
+  if (score > 30) {
+    mood = "positive";
+    icon = score > 60 ? "😄" : "😊";
+  } else if (score > 10) {
+    mood = "positive";
+    icon = "🙂";
+  } else if (score < -30) {
+    mood = "negative";
+    icon = score < -60 ? "😢" : "😔";
+  } else if (score < -10) {
+    mood = "negative";
+    icon = "😕";
+  }
+  
+  return { mood, score, icon, confidence };
+};
+
+/**
+ * ERROR HANDLING UTILITIES
+ */
+
+export interface ErrorInfo {
+  message: string;
+  type: 'validation' | 'network' | 'rate_limit' | 'timeout' | 'server' | 'unknown';
+  userMessage: string;
+  retryable: boolean;
+}
+
+/**
+ * Parses errors into user-friendly messages
+ */
+export const parseError = (error: unknown): ErrorInfo => {
+  if (error instanceof Error) {
+    // Timeout error
+    if (error.message.includes('timeout')) {
+      return {
+        message: error.message,
+        type: 'timeout',
+        userMessage: 'Request timed out. Please try again.',
+        retryable: true,
+      };
+    }
+    
+    // Network error
+    if (error.message.includes('fetch') || error.message.includes('network')) {
+      return {
+        message: error.message,
+        type: 'network',
+        userMessage: 'Network error. Please check your connection.',
+        retryable: true,
+      };
+    }
+    
+    // HTTP error
+    if (error.message.includes('HTTP')) {
+      return {
+        message: error.message,
+        type: 'server',
+        userMessage: 'Server error. Please try again later.',
+        retryable: true,
+      };
+    }
+    
+    return {
+      message: error.message,
+      type: 'unknown',
+      userMessage: error.message,
+      retryable: false,
+    };
+  }
+  
+  return {
+    message: 'Unknown error',
+    type: 'unknown',
+    userMessage: 'An unexpected error occurred',
+    retryable: false,
+  };
+};
+
+/**
+ * FORMAT UTILITIES
+ */
+
+/**
+ * Formats milliseconds to human-readable time
+ */
+export const formatTimeRemaining = (ms: number): string => {
+  if (ms <= 0) return 'now';
+  
+  const seconds = Math.ceil(ms / 1000);
+  
+  if (seconds < 60) {
+    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+  }
+  
+  const minutes = Math.ceil(seconds / 60);
+  return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+};
+
+/**
+ * Formats rate limit status for display
+ */
+export const formatRateLimitStatus = (limiter: RateLimiter): string => {
+  const status = limiter.getStatus();
+  
+  if (status.remaining > 0) {
+    return `${status.remaining}/${status.maxCalls} requests available`;
+  }
+  
+  const timeRemaining = formatTimeRemaining(status.nextAvailable);
+  return `Rate limit reached. Try again in ${timeRemaining}`;
+};
+
+/**
+ * CONFIGURATION PRESETS
+ */
+
+export const RATE_LIMITS = {
+  // Conservative - for paid APIs
+  CLAUDE_AI: { maxCalls: 5, timeWindow: 60000 },  // 5 calls/minute
+  
+  // Moderate - for free tier APIs
+  FREE_AI: { maxCalls: 10, timeWindow: 60000 },   // 10 calls/minute
+  
+  // Generous - for local/unlimited APIs
+  LOCAL: { maxCalls: 30, timeWindow: 60000 },     // 30 calls/minute
+  
+  // Very strict - for expensive APIs
+  PREMIUM: { maxCalls: 2, timeWindow: 60000 },    // 2 calls/minute
+} as const;
+
+export const TIMEOUTS = {
+  SHORT: 5000,   // 5 seconds - for fast endpoints
+  MEDIUM: 10000, // 10 seconds - standard
+  LONG: 30000,   // 30 seconds - for AI responses
+  VERY_LONG: 60000, // 1 minute - for complex operations
+} as const;
+
+/**
+ * VALIDATION PRESETS
+ */
+
+export const MESSAGE_LIMITS = {
+  SHORT: 100,    // For quick messages
+  MEDIUM: 500,   // For chat messages
+  LONG: 1000,    // For detailed queries
+  VERY_LONG: 5000, // For document analysis
+} as const;
+
+// Export type helpers
+export type RateLimitPreset = keyof typeof RATE_LIMITS;
+export type TimeoutPreset = keyof typeof TIMEOUTS;
+export type MessageLimitPreset = keyof typeof MESSAGE_LIMITS;
