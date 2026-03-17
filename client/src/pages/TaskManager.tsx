@@ -13,14 +13,17 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Check, Trash2, AlertCircle } from "lucide-react";
+import { Plus, Check, Trash2, AlertCircle, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+type TaskFilter = "all" | "today" | "high";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Task, InsertTask } from "@shared/schema";
 
 export default function TaskManager() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [filter, setFilter] = useState<TaskFilter>("all");
   const [newTask, setNewTask] = useState<Partial<InsertTask>>({
     title: "",
     description: "",
@@ -91,7 +94,18 @@ export default function TaskManager() {
     },
   });
 
-  const activeTasks = tasks?.filter((t) => t.status === "active") || [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
+  const activeTasks = (tasks?.filter((t) => t.status === "active") || []).filter((t) => {
+    if (filter === "today") {
+      const due = new Date(t.dueDate);
+      return due >= today && due < tomorrow;
+    }
+    if (filter === "high") return t.priority === "high";
+    return true;
+  });
 
   const handleCreateTask = () => {
     if (!newTask.title?.trim()) {
@@ -209,6 +223,22 @@ export default function TaskManager() {
         </Dialog>
       </div>
 
+      {/* Filter Buttons */}
+      <div className="flex items-center gap-2">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        {(["all", "today", "high"] as TaskFilter[]).map((f) => (
+          <Button
+            key={f}
+            size="sm"
+            variant={filter === f ? "default" : "outline"}
+            onClick={() => setFilter(f)}
+            data-testid={`filter-${f}`}
+          >
+            {f === "all" ? "All" : f === "today" ? "Due Today" : "High Priority"}
+          </Button>
+        ))}
+      </div>
+
       {/* Tasks List */}
       {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">
@@ -218,7 +248,11 @@ export default function TaskManager() {
         <Card className="lcars-scanner">
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground" data-testid="text-no-tasks">
-              No active tasks. Great job! 🎉
+              {filter === "all"
+                ? "No active tasks. Great job! 🎉"
+                : filter === "today"
+                ? "No tasks due today."
+                : "No high priority tasks."}
             </p>
           </CardContent>
         </Card>

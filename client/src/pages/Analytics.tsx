@@ -1,11 +1,21 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, CheckCircle2, Zap, Target, Activity } from "lucide-react";
+import { TrendingUp, CheckCircle2, Zap, Target, Activity, Terminal } from "lucide-react";
 
 export default function Analytics() {
   const { data: stats } = useQuery({
     queryKey: ["/api/analytics/stats"],
   });
+
+  // Stable random values — generated once per mount, not on every render
+  const weeklyActivity = useMemo(
+    () =>
+      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
+        (day) => ({ day, value: Math.floor(Math.random() * 100) })
+      ),
+    []
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -80,23 +90,20 @@ export default function Analytics() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day, index) => {
-              const value = Math.floor(Math.random() * 100);
-              return (
-                <div key={day} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-foreground">{day}</span>
-                    <span className="text-muted-foreground">{value}%</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary to-secondary lcars-glow"
-                      style={{ width: `${value}%` }}
-                    />
-                  </div>
+            {weeklyActivity.map(({ day, value }) => (
+              <div key={day} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-foreground">{day}</span>
+                  <span className="text-muted-foreground">{value}%</span>
                 </div>
-              );
-            })}
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-secondary lcars-glow"
+                    style={{ width: `${value}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -185,4 +192,3 @@ function GoalProgress({ label, current, target }: { label: string; current: numb
   );
 }
 
-import { Terminal } from "lucide-react";

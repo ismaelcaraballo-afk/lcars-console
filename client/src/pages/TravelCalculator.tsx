@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Navigation, Clock, Fuel } from "lucide-react";
+import { MapPin, Navigation, Clock, CalendarClock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import type { Task } from "@shared/schema";
 
 export default function TravelCalculator() {
   const { toast } = useToast();
@@ -20,6 +22,21 @@ export default function TravelCalculator() {
   const [mode, setMode] = useState("driving");
   const [route, setRoute] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  const { data: tasks } = useQuery<Task[]>({ queryKey: ["/api/tasks"] });
+
+  const nextTask = tasks
+    ?.filter((t) => t.status === "active" && new Date(t.dueDate) > new Date())
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0];
+
+  const fillFromNextTask = () => {
+    if (!nextTask) {
+      toast({ title: "No upcoming tasks", description: "Add a task with a future due date first.", variant: "destructive" });
+      return;
+    }
+    setDestination(nextTask.title);
+    toast({ title: "Filled from next task", description: `Destination set to: ${nextTask.title}` });
+  };
 
   const handleCalculate = async () => {
     if (!origin.trim() || !destination.trim()) {
@@ -91,7 +108,22 @@ export default function TravelCalculator() {
             />
           </div>
           <div>
-            <Label htmlFor="destination">Destination</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label htmlFor="destination">Destination</Label>
+              {nextTask && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={fillFromNextTask}
+                  className="h-6 text-xs gap-1"
+                  data-testid="button-fill-next-task"
+                >
+                  <CalendarClock className="h-3 w-3" />
+                  Next task: {nextTask.title.length > 20 ? nextTask.title.slice(0, 20) + "…" : nextTask.title}
+                </Button>
+              )}
+            </div>
             <Input
               id="destination"
               placeholder="Destination location"

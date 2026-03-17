@@ -39,7 +39,8 @@ export function useVoiceRecognition(
 
         // Check if command starts with "Computer" (Star Trek style!)
         if (transcriptText.toLowerCase().startsWith("computer")) {
-          const command = transcriptText.substring(8).trim();
+          const idx = transcriptText.toLowerCase().indexOf("computer") + "computer".length;
+          const command = transcriptText.substring(idx).replace(/^[\s,]+/, "").trim();
           console.log("⚡ Processing command:", command);
           
           // Play acknowledgment beep
